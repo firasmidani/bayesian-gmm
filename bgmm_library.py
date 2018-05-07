@@ -113,7 +113,7 @@ def updateMVNormalMu(data,precision,PriorMean):
     return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
  
 def updateMVNormalSigma(data,Sigma,precision):
-    '''
+	'''
     updateMVNormalSigma updates the covariance hyperparameter for MultiVariate Normal distribution
 
     Keyword arguments:
@@ -143,7 +143,7 @@ def updateMVNormalSigma(data,Sigma,precision):
  	Returns numpy.ndarray (p x p)
  	'''
 
- 	# number of samples
+	# number of samples
  	n = float(len(data_j)); 
 
     # update DOF
@@ -164,7 +164,7 @@ def updateMVNormalSigma(data,Sigma,precision):
     return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
 
 def sampleMu(data_j,tau_j,xi_j,Sigma_s):
-    '''
+	'''
     sampleMu generates posterior sample of mean using a MultiVariate Normal distribution
 
     Keyword arguments:
