@@ -4,7 +4,7 @@
 # Start date: 2018-05-07
 # Final date: 2018-05-07
 
-# DESCRIPTION Library of functions for analysis of flow cytometry data
+# DESCRIPTION Library of functions for Bayesian Multivariate Guassian Mixture Model (BMGMM)
 
 # TABLE OF CONTENTS
 #
@@ -33,6 +33,8 @@
 import numpy as np
 
 from scipy.stats import dirichlet,invwishart,multinomial,multivariate_normal
+
+# FUNCTIONS
 
 def computeDeviationMeans(data,PriorMean):
     '''
