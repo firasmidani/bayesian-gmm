@@ -22,7 +22,7 @@ def updateInvWishartDOF(data,m):
 
 	Keyword arguments:
 	data -- n-dimensional data as numpy.ndarray
-	m -- prior degrees of freedom as int or float
+	m -- prior degrees of freedom hyperparameter as int or float
 
 	Returns float
 	'''
@@ -31,3 +31,17 @@ def updateInvWishartDOF(data,m):
 
 	return n+float(m)
 
+def updateInvWishartScaleMatrix(PriorScaleMatrix,SumSquares,DeviationMeans):
+    '''
+    updateInvWishartScaleMatrix updates the scale matrix hyperparameter for the Inverse Wishart distribution
+
+    Keyword arguments:
+    PriorScaleMatrix -- prior scale matrix hyperparameter as numpy.ndarray
+    SumSquares -- sum of squares for deviation of data from mean as numpy.ndarray
+    DeviationMeans -- deviation between the prior and estimate mean values as numpy.ndarray
+
+    Returns nump.ndarray
+    '''
+
+    return PriorScaleMatrix + SumSquares + DeviationMeans
+    
