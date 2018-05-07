@@ -44,4 +44,28 @@ def updateInvWishartScaleMatrix(PriorScaleMatrix,SumSquares,DeviationMeans):
     '''
 
     return PriorScaleMatrix + SumSquares + DeviationMeans
+
+def computeSumSquares(data):
+	'''
+	computeSumSquares computes sum of squares for deviation of data from mean
+
+	Keyword arguments:
+	data -- n-dimensional data as numpy.ndarray	
+
+	Returns numpy.ndarray
+	'''
+
+	# estimate mean values
+    y_bar = np.mean(data,axis=0);
+
+    # estimate deviation from mean
+    deviations = np.matrix(data - y_bar);
+    
+    # dot product of deviations from mean
+    Squares = [deviation.transpose()*deviation for deviation in deviations]
+
+    # sum deviationd ot products
+    SumSquares = np.sum(Squares,axis=0)
+    
+    return SumSquares
     
