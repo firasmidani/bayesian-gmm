@@ -17,20 +17,20 @@ import numpy as np
 from scipy.stats import dirichlet,invwishart,multinomial,multivariate_normal
 
 def updateInvWishartDOF(data,m):
-	'''
-	updateInvWishartDOF updates the degrees of freedom hyperparameter for Inverse Wishart distribution
+    '''
+    updateInvWishartDOF updates the degrees of freedom hyperparameter for Inverse Wishart distribution
 
-	Keyword arguments:
-	data -- n-dimensional data as numpy.ndarray
-	m -- prior degrees of freedom hyperparameter as int or float
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray
+    m -- prior degrees of freedom hyperparameter as int or float
 
-	Returns float
-	'''
+    Returns float
+    '''
 
-	# number of samples
-	n = len(data)
+    # number of samples
+    n = len(data)
 
-	return n+float(m)
+    return n+float(m)
 
 def updateInvWishartScaleMatrix(PriorScaleMatrix,SumSquares,DeviationMeans):
 	'''
@@ -182,5 +182,5 @@ def sampleMu(data_j,tau_j,xi_j,Sigma_s):
 	# updates the covariance hyperparameter
 	updatedSigma = updateMVNormalSigma(data,Sigma_s,tau_j);
 
-return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
+	return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
 
