@@ -33,154 +33,154 @@ def updateInvWishartDOF(data,m):
     return n+float(m)
 
 def updateInvWishartScaleMatrix(PriorScaleMatrix,SumSquares,DeviationMeans):
-	'''
-	updateInvWishartScaleMatrix updates the scale matrix hyperparameter for the Inverse Wishart distribution
+    '''
+    updateInvWishartScaleMatrix updates the scale matrix hyperparameter for the Inverse Wishart distribution
 
-	Keyword arguments:
-	PriorScaleMatrix -- prior scale matrix hyperparameter as numpy.ndarray (p x p)
-	SumSquares -- sum of squares for deviation of data from mean as numpy.ndarray (p x p)
-	DeviationMeans -- deviation between the prior and estimate mean values as numpy.ndarray (p x p)
+    Keyword arguments:
+    PriorScaleMatrix -- prior scale matrix hyperparameter as numpy.ndarray (p x p)
+    SumSquares -- sum of squares for deviation of data from mean as numpy.ndarray (p x p)
+    DeviationMeans -- deviation between the prior and estimate mean values as numpy.ndarray (p x p)
 
-	Returns nump.ndarray (p x p)
-	'''
+    Returns nump.ndarray (p x p)
+    '''
 
-	return PriorScaleMatrix + SumSquares + DeviationMeans
+    return PriorScaleMatrix + SumSquares + DeviationMeans
 
 def computeSumSquares(data):
-	'''
-	computeSumSquares computes sum of squares for deviation of data from mean
+    '''
+    computeSumSquares computes sum of squares for deviation of data from mean
 
-	Keyword arguments:
-	data -- n-dimensional data as numpy.ndarray (n x p)
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray (n x p)
 
-	Returns numpy.ndarray (p x p)
-	'''
+    Returns numpy.ndarray (p x p)
+    '''
 
-	# estimate mean values
-	y_bar = np.mean(data,axis=0);
+    # estimate mean values
+    y_bar = np.mean(data,axis=0);
 
-	# estimate deviation from mean
-	deviations = np.matrix(data - y_bar);
+    # estimate deviation from mean
+    deviations = np.matrix(data - y_bar);
 
-	# compute squares of deviations from mean
-	Squares = [deviation.transpose()*deviation for deviation in deviations]
+    # compute squares of deviations from mean
+    Squares = [deviation.transpose()*deviation for deviation in deviations]
 
-	# sum deviations of dot products
-	SumSquares = np.sum(Squares,axis=0)
+    # sum deviations of dot products
+    SumSquares = np.sum(Squares,axis=0)
 
-	return SumSquares
+    return SumSquares
 
 def computeDeviationMeans(data,PriorMean):
-	'''
-	computeDeviationMeans compute squares for deviation between prior and esitmated mean values
+    '''
+    computeDeviationMeans compute squares for deviation between prior and esitmated mean values
 
-	Keyword arguments:
-	data -- n-dimensional data as numpy.ndarray (n x p)
-	PriorMean -- prior mean hyperparameter as numpy.ndarray (p x 1)
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    PriorMean -- prior mean hyperparameter as numpy.ndarray (p x 1)
 
-	Returns numpy.ndarray (p x p)
-	'''
+    Returns numpy.ndarray (p x p)
+    '''
 
-	# estimate mean values
-	y_bar = np.mean(data,axis=0);
+    # estimate mean values
+    y_bar = np.mean(data,axis=0);
 
-	# estimate deviation from prior mean value
-	deviations = np.matrix(y_bar - PriorMean.transpose());
+    # estimate deviation from prior mean value
+    deviations = np.matrix(y_bar - PriorMean.transpose());
 
-	# compute squares of deviations from prior mean
-	Squares = deviation.transpose()*deviation
+    # compute squares of deviations from prior mean
+    Squares = deviation.transpose()*deviation
 
-	return Squares
-    
+    return Squares
+
 def updateMVNormalMu(data,precision,PriorMean):
- 	'''
-	updateMVNormalMu updates the mean hyperparamter for MultiVariate Normal distribution
+    '''
+    updateMVNormalMu updates the mean hyperparamter for MultiVariate Normal distribution
 
-	Keyword arguments:
-	data -- n-dimensional data as numpy.ndarray (n x p)
-	precision -- prior precision hyperparameter as float (1 x 1) 
-	PriorMean -- prior mean values as numpy.ndarray (p x 1)
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    precision -- prior precision hyperparameter as float (1 x 1) 
+    PriorMean -- prior mean values as numpy.ndarray (p x 1)
 
-	Returns numpy.ndarray (p x p)
-	'''
+    Returns numpy.ndarray (p x p)
+    '''
 
-	# number of samples
-	n = len(data);
+    # number of samples
+    n = len(data);
 
-	# estimate mean values
-	y_bar = np.mean(data,axis=0); # (1 x p)
+    # estimate mean values
+    y_bar = np.mean(data,axis=0); # (1 x p)
 
-	return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
- 
+   return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
+
 def updateMVNormalSigma(data,Sigma,precision):
-	'''
-	updateMVNormalSigma updates the covariance hyperparameter for MultiVariate Normal distribution
+    '''
+    updateMVNormalSigma updates the covariance hyperparameter for MultiVariate Normal distribution
 
-	Keyword arguments:
-	data -- n-dimensional data as numpy.ndarray (n x p)
-	Sigma -- prior covariance as numpy.ndarray (p x p)
-	precision -- priro precision hyperparameter as float (1 x 1)
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    Sigma -- prior covariance as numpy.ndarray (p x p)
+    precision -- priro precision hyperparameter as float (1 x 1)
 
-	Returns numpy.ndarray (p x p)
-	'''
+    Returns numpy.ndarray (p x p)
+    '''
 
-	# number of samples
-	n = len(data);
+   # number of samples
+   n = len(data);
 
-	return np.dot(float(1)/(float(precision)+n),Sigma)
+   return np.dot(float(1)/(float(precision)+n),Sigma)
 
- def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j):
-	'''
-	sampleSigma generates posterior sample of covariance using an Inverse Wishart distribution
+def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j):
+    '''
+    sampleSigma generates posterior sample of covariance using an Inverse Wishart distribution
 
-	Keyword arguments:
-	data_j -- n-dimensional data as numpy.ndarray (n x p)
-	m_j -- updated degrees of freedom hyperparameter as float (1 x 1)
-	psi_j -- prior scale matrix hyperparameter as numpy.ndarray (p x p)
-	tau_j -- prior precision hyperparameter (1 x 1)
-	xi_j -- prior mean hyperparameter (1 x p)
+    Keyword arguments:
+    data_j -- n-dimensional data as numpy.ndarray (n x p)
+    m_j -- updated degrees of freedom hyperparameter as float (1 x 1)
+    psi_j -- prior scale matrix hyperparameter as numpy.ndarray (p x p)
+    tau_j -- prior precision hyperparameter (1 x 1)
+    xi_j -- prior mean hyperparameter (1 x p)
 
-	Returns numpy.ndarray (p x p)
-	'''
+    Returns numpy.ndarray (p x p)
+    '''
 
-	# number of samples
-	n = float(len(data_j)); 
+    # number of samples
+    n = float(len(data_j)); 
 
-	# update DOF
-	iw_dof = updateInvWishartDOF(data,m_j);
+    # update DOF
+    iw_dof = updateInvWishartDOF(data,m_j);
 
-	# update Scale Matirx
+    # update Scale Matirx
 
-	# 1 -- compute sum of squares
-	iw_SumSquares = computeSumSquares(data);
+    # 1 -- compute sum of squares
+    iw_SumSquares = computeSumSquares(data);
 
-	# 2 -- compute deviation of mean values from prior
-	iw_DeviationMeans = computeDeviationMeans(data,xi_j);
-	iw_DeviationMeans = np.dot(((n*tau_j)/(n+tau_j)),iw_DeviationMeans); 
+    # 2 -- compute deviation of mean values from prior
+    iw_DeviationMeans = computeDeviationMeans(data,xi_j);
+    iw_DeviationMeans = np.dot(((n*tau_j)/(n+tau_j)),iw_DeviationMeans); 
 
-		# 3 -- put it together
-	iw_scale = updateInvWishartScaleMatrix(psi_j,iw_SumSquares,iw_DeviationMeans);
+    # 3 -- put it together
+    iw_scale = updateInvWishartScaleMatrix(psi_j,iw_SumSquares,iw_DeviationMeans);
 
-	return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
+    return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
 
 def sampleMu(data_j,tau_j,xi_j,Sigma_s):
-	'''
-	sampleMu generates posterior sample of mean using a MultiVariate Normal distribution
+    '''
+    sampleMu generates posterior sample of mean using a MultiVariate Normal distribution
 
-	Keyword arguments:
-	data_j -- n-dimensional data as numpy.ndarray (n x p)
-	xi_j -- prior mean hyperparameter (1 x p)
-	tau_j -- prior precision hyperparameter (1 x 1)
-	Sigma_S -- prior estimate of covariance (p x x)
+    Keyword arguments:
+    data_j -- n-dimensional data as numpy.ndarray (n x p)
+    xi_j -- prior mean hyperparameter (1 x p)
+    tau_j -- prior precision hyperparameter (1 x 1)
+    Sigma_S -- prior estimate of covariance (p x x)
 
-	Returns 
-	'''
+    Returns 
+    '''
 
-	# updates the mean hyperparameter
-	updatedMu = np.ravel(updateMVNormalMu(data,tau_j,xi_j));
+    # updates the mean hyperparameter
+    updatedMu = np.ravel(updateMVNormalMu(data,tau_j,xi_j));
 
-	# updates the covariance hyperparameter
-	updatedSigma = updateMVNormalSigma(data,Sigma_s,tau_j);
+    # updates the covariance hyperparameter
+    updatedSigma = updateMVNormalSigma(data,Sigma_s,tau_j);
 
-	return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
+    return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
 
