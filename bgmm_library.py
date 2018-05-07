@@ -190,7 +190,7 @@ def updateOmega(data,labels,a):
 
     Keyword argumetns:
     data -- n-dimensional data as numpy.ndarray (n x p)
-    labels -- sample labels as numpy.ndarray (1 x n)
+    labels -- sample labels as numpy.ndarr  ay (1 x n)
     a -- prior label weights as numpy.ndarray (1 x j)
 
     Returns numpy.ndarray (1 x j)
@@ -203,3 +203,17 @@ def updateOmega(data,labels,a):
     V = [list(labels).count(ii) for ii in range(n_labels)];
 
     return dirichlet([xx+yy for xx,yy in zip(a,V)]).rvs(1)[0]
+
+def f(data_i,mu_j,Sigma_j):
+    '''
+    f computes probability of value sampled from a MultiVariate Normal distribution
+
+    Keyword arguments:
+    data_i -- n-dimensional data as numpy.ndarray (1 x p)
+    mu_j -- mean as numpy.ndarray (1 x p)
+    Sigma_j -- covariance as numpy.ndarray (p x p)
+
+    Returns float
+    '''
+
+    return multivariate_normal(mean=mu_j,cov=Sigma_j).pdf(data_i)
