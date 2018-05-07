@@ -129,7 +129,7 @@ def updateMVNormalSigma(data,Sigma,precision):
     
     return np.dot(float(1)/(float(precision)+n),Sigma)
 
- def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j,):
+ def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j):
  	'''
  	sampleSigma generates posterior sample of covariance using an Inverse Wishart distribution
 
@@ -151,14 +151,14 @@ def updateMVNormalSigma(data,Sigma,precision):
 
     # update Scale Matirx
 
-  	## 1 -- compute sum of squares
+  	# 1 -- compute sum of squares
     iw_SumSquares = computeSumSquares(data);
     
-    ## 2 -- compute deviation of mean values from prior
+    # 2 -- compute deviation of mean values from prior
     iw_DeviationMeans = computeDeviationMeans(data,xi_j);
     iw_DeviationMeans = np.dot(((n*tau_j)/(n+tau_j)),iw_DeviationMeans); 
     
-    ## 3 -- put it together
+    # 3 -- put it together
     iw_scale = updateInvWishartScaleMatrix(psi_j,iw_SumSquares,iw_DeviationMeans);
 
     return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
