@@ -14,10 +14,10 @@
 #
 #|-- Algebraic manipulations
 #     |-- computePosteriorLabels
-#     |-- t
+#     |-- computeWeightedMVNormalPDF
 #
 #|-- Distribution sampling
-#     |-- f
+#     |-- computeMVNormalPDF
 #     |-- sampleMu
 #     |-- sampleSigma
 #
@@ -55,6 +55,20 @@ def computeDeviationMeans(data,PriorMean):
     Squares = deviation.transpose()*deviation
 
     return Squares
+
+def computeMVNormalPDF(data_i,mu_j,Sigma_j):
+    '''
+    f computes probability of value sampled from a MultiVariate Normal distribution
+
+    Keyword arguments:
+    data_i -- n-dimensional data as numpy.ndarray (1 x p)
+    mu_j -- mean as numpy.ndarray (1 x p)
+    Sigma_j -- covariance as numpy.ndarray (p x p)
+
+    Returns float
+    '''
+
+    return multivariate_normal(mean=mu_j,cov=Sigma_j).pdf(data_i)
 
 def computeSumSquares(data):
     '''
@@ -99,7 +113,7 @@ def computePosteriorLabels(data,labels,Mu_s,Sigma_s,Omega_s):
     for data_i in data:
 
         # compute posterior label probabilities 
-        proba = t(data_i,labels,Mu_s,Sigma_s,Omega_s);
+        proba = computeWeightedMVNormalPDF(data_i,labels,Mu_s,Sigma_s,Omega_s);
 
         # record probabilities and the label with maximum probability
         proba_list.append(proba);
@@ -107,19 +121,34 @@ def computePosteriorLabels(data,labels,Mu_s,Sigma_s,Omega_s):
 
     return proba_list,proba_max_list
 
-def f(data_i,mu_j,Sigma_j):
-    '''
-    f computes probability of value sampled from a MultiVariate Normal distribution
 
-    Keyword arguments:
+def computeWeightedMVNormalPDF(data_i,labels,Mu_s,Sigma_s,Omega_s):
+    '''
+    t computes probability of a sample belonging to each cluster
+
+    Keyword argumetns:
     data_i -- n-dimensional data as numpy.ndarray (1 x p)
-    mu_j -- mean as numpy.ndarray (1 x p)
-    Sigma_j -- covariance as numpy.ndarray (p x p)
+    labels -- cluster labels (1 x j)
+    Mu_s -- mean as numpy.ndarray (1 x p)
+    Sigma_s -- covariance as numpy.ndarray (p x p)
+    Omega_s -- label weights as numpy.ndarray (1 x j)
 
-    Returns float
+    Returns numpy.ndarray (1 x j)
     '''
 
-    return multivariate_normal(mean=mu_j,cov=Sigma_j).pdf(data_i)
+    mixture, proba = [],[]
+
+    # compute label probability for each cluster
+    for jj,mj,sj,wj in zip(set(labels),Mu_s,Sigma_s,Omega_s):
+
+        mixture.append(wj*computeMVNormalPDF(data_i,mj,sj))
+
+    # normalize label probability by marginal probability over all labels
+    for mix in mixture:
+
+        proba.append(float(mix)/np.sum(mixture));
+
+    return proba
 
 def sampleMu(data_j,tau_j,xi_j,Sigma_s):
     '''
@@ -175,34 +204,6 @@ def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j):
     iw_scale = updateInvWishartScaleMatrix(psi_j,iw_SumSquares,iw_DeviationMeans);
 
     return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
-
-def t(data_i,labels,Mu_s,Sigma_s,Omega_s):
-    '''
-    t computes probability of a sample belonging to each cluster
-
-    Keyword argumetns:
-    data_i -- n-dimensional data as numpy.ndarray (1 x p)
-    labels -- cluster labels (1 x j)
-    Mu_s -- mean as numpy.ndarray (1 x p)
-    Sigma_s -- covariance as numpy.ndarray (p x p)
-    Omega_s -- label weights as numpy.ndarray (1 x j)
-
-    Returns numpy.ndarray (1 x j)
-    '''
-
-    mixture, proba = [],[]
-
-    # compute label probability for each cluster
-    for jj,mj,sj,wj in zip(set(labels),Mu_s,Sigma_s,Omega_s):
-
-        mixture.append(wj*f(data_i,mj,sj))
-
-    # normalize label probability by marginal probability over all labels
-    for mix in mixture:
-
-        proba.append(float(mix)/np.sum(mixture));
-
-    return proba
 
 def updateInvWishartDOF(data,m):
     '''
