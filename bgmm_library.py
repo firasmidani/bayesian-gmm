@@ -217,3 +217,58 @@ def f(data_i,mu_j,Sigma_j):
     '''
 
     return multivariate_normal(mean=mu_j,cov=Sigma_j).pdf(data_i)
+
+def t(data_i,labels,Mu_s,Sigma_s,Omega_s):
+	'''
+	t computes probability of a sample belonging to each cluster
+
+	Keyword argumetns:
+    data_i -- n-dimensional data as numpy.ndarray (1 x p)
+    labels -- cluster labels (1 x j)
+    Mu_s -- mean as numpy.ndarray (1 x p)
+    Sigma_s -- covariance as numpy.ndarray (p x p)
+    Omega_s -- label weights as numpy.ndarray (1 x j)
+
+   	Returns numpy.ndarray (1 x j)
+	'''
+
+	mixture, proba = [],[]
+
+	# compute label probability for each cluster
+	for jj,mj,sj,wj in zip(set(labels),Mu_s,Sigma_s,Omega_s):
+
+		mixture.append(wj*f(data_i,mj,sj))
+
+	# normalize label probability by marginal probability over all labels
+	for mix in mixture:
+
+		proba.append(float(mix)/np.sum(mixture));
+
+	return proba
+
+def computePosteriorLabels(data,labels,Mu_s,Sigma_s,Omega_s):
+	'''
+	computePosteriorLabels calcualte posterior for each data point belonging to each label
+	
+	Keyword argumetns:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    labels -- cluster labels (1 x j)
+    Mu_s -- mean as numpy.ndarray (1 x p)
+    Sigma_s -- covariance as numpy.ndarray (p x p)
+    Omega_s -- label weights as numpy.ndarray (1 x j)
+
+	Returns numpy.ndarray (1 x j)
+	'''
+
+	proba_list,proba_max_list = [],[];
+
+	for data_i in data:
+
+		# compute posterior label probabilities 
+		proba = t(data_i,labels,Mu_s,Sigma_s,Omega_s);
+
+		# record probabilities and the label with maximum probability
+		proba_list.append(proba);
+		proba_max_list.append(np.where(proba==np.max(proba))[0][0])
+
+	return proba_list,proba_max_list
