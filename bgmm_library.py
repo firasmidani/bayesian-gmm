@@ -76,7 +76,7 @@ def computeDeviationMeans(data,PriorMean):
 
     Keyword arguments:
     data -- n-dimensional data as numpy.ndarray (n x p)
-    PriorMean -- prior mean values (p x 1)
+    PriorMean -- prior mean values as numpy.ndarray (p x 1)
 
     Returns numpy.ndarray (p x p)
     '''
@@ -98,8 +98,8 @@ def updateMVNormalMu(data,precision,PriorMean):
 
     Keyword arguments:
     data -- n-dimensional data as numpy.ndarray (n x p)
-    precision -- prior precision hyperparameter (1 x 1) 
-    PriorMean -- prior mean values (p x 1)
+    precision -- prior precision hyperparameter as float (1 x 1) 
+    PriorMean -- prior mean values as numpy.ndarray (p x 1)
 
     Returns numpy.ndarray (p x p)
     '''
@@ -110,5 +110,19 @@ def updateMVNormalMu(data,precision,PriorMean):
 	# estimate mean values
     y_bar = np.mean(data,axis=0); # (1 x p)
     
-    return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+precision)
+    return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
+ 
+def updateMVNormalSigma(data,Sigma,precision):
+    '''
+    updateMVNormalSigma updates the covariance hyperparameter for MultiVariate Normal distribution
+
+    Keyword arguments:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    Sigma -- prior covariance as numpy.ndarray (p x p)
+    precision -- priro precision hyperparameter as float (1 x 1)
+    '''
+
+    # number of samples
+    n = len(data);
     
+    return np.dot(float(1)/(float(precision)+n),Sigma)
