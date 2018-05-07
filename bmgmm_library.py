@@ -51,7 +51,7 @@ def computeDeviationMeans(data,PriorMean):
     y_bar = np.mean(data,axis=0);
 
     # estimate deviation from prior mean value
-    deviations = np.matrix(y_bar - PriorMean.transpose());
+    deviation = np.matrix(y_bar - PriorMean.transpose());
 
     # compute squares of deviations from prior mean
     Squares = deviation.transpose()*deviation
@@ -166,10 +166,10 @@ def sampleMu(data_j,tau_j,xi_j,Sigma_s):
     '''
 
     # updates the mean hyperparameter
-    updatedMu = np.ravel(updateMVNormalMu(data,tau_j,xi_j));
+    updatedMu = np.ravel(updateMVNormalMu(data_j,tau_j,xi_j));
 
     # updates the covariance hyperparameter
-    updatedSigma = updateMVNormalSigma(data,Sigma_s,tau_j);
+    updatedSigma = updateMVNormalSigma(data_j,Sigma_s,tau_j);
 
     return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
 
@@ -191,15 +191,15 @@ def sampleSigma(data_j,m_j,psi_j,tau_j,xi_j):
     n = float(len(data_j)); 
 
     # update DOF
-    iw_dof = updateInvWishartDOF(data,m_j);
+    iw_dof = updateInvWishartDOF(data_j,m_j);
 
     # update Scale Matirx
 
     # 1 -- compute sum of squares
-    iw_SumSquares = computeSumSquares(data);
+    iw_SumSquares = computeSumSquares(data_j);
 
     # 2 -- compute deviation of mean values from prior
-    iw_DeviationMeans = computeDeviationMeans(data,xi_j);
+    iw_DeviationMeans = computeDeviationMeans(data_j,xi_j);
     iw_DeviationMeans = np.dot(((n*tau_j)/(n+tau_j)),iw_DeviationMeans); 
 
     # 3 -- put it together
@@ -255,7 +255,7 @@ def updateMVNormalMu(data,precision,PriorMean):
     # estimate mean values
     y_bar = np.mean(data,axis=0); # (1 x p)
 
-   return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
+    return (np.dot(precision,PriorMean).transpose()+np.dot(n,y_bar))/(n+float(precision))
 
 def updateMVNormalSigma(data,Sigma,precision):
     '''
@@ -269,12 +269,12 @@ def updateMVNormalSigma(data,Sigma,precision):
     Returns numpy.ndarray (p x p)
     '''
 
-   # number of samples
-   n = len(data);
+    # number of samples
+    n = len(data);
 
-   return np.dot(float(1)/(float(precision)+n),Sigma)
+    return np.dot(float(1)/(float(precision)+n),Sigma)
 
-def updateOmega(data,labels,a):
+def updateOmega(labels,a):
     '''
     updateOmega updates label weights (i.e. probabilities) using a Dirichlet distribution
 
