@@ -76,7 +76,7 @@ def computeDeviationMeans(data,PriorMean):
 
     Keyword arguments:
     data -- n-dimensional data as numpy.ndarray (n x p)
-    PriorMean -- prior mean values as numpy.ndarray (p x 1)
+    PriorMean -- prior mean hyperparameter as numpy.ndarray (p x 1)
 
     Returns numpy.ndarray (p x p)
     '''
@@ -120,9 +120,45 @@ def updateMVNormalSigma(data,Sigma,precision):
     data -- n-dimensional data as numpy.ndarray (n x p)
     Sigma -- prior covariance as numpy.ndarray (p x p)
     precision -- priro precision hyperparameter as float (1 x 1)
+
+    Returns numpy.ndarray (p x p)
     '''
 
     # number of samples
     n = len(data);
     
     return np.dot(float(1)/(float(precision)+n),Sigma)
+
+ def sampleSigma(data_j,m_j,xi_j,psi_j):
+ 	'''
+ 	sampleSigma generates posterior sample of covariance using an Inverse Wishart distribution
+
+ 	Keyword arguments:
+ 	data_j -- n-dimensional data as numpy.ndarray (n x p)
+ 	m_j -- updated degrees of freedom hyperparameter as float (1 x 1)
+ 	xi_j -- prior mean hyperparameter
+ 	psi_j -- prior scale matrix hyperparameter as numpy.ndarray (p x p)
+
+ 	Returns numpy.ndarray (p x p)
+ 	'''
+
+ 	# number of samples
+ 	n = float(len(data_j)); 
+
+    # update DOF
+    iw_dof = updateInvWishartDOF(data,m_j);
+
+    # update Scale Matirx
+
+  	## 1 -- compute sum of squares
+    iw_SumSquares = computeSumSquares(data);
+    
+    ## 2 -- compute deviation of mean values from prior
+    iw_DeviationMeans = computeDeviationMeans(data,xi_j);
+    iw_DeviationMeans = np.dot(((n*tau_j)/(n+tau_j)),iw_DeviationMeans); 
+    
+    ## 3 -- put it together
+    iw_scale = updateInvWishartScaleMatrix(psi_j,iw_SumSquares,iw_DeviationMeans);
+    
+    return invwishart(df=iw_dof,scale=iw_scale).rvs(1)
+
