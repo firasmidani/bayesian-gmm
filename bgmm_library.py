@@ -184,3 +184,22 @@ def sampleMu(data_j,tau_j,xi_j,Sigma_s):
 
     return multivariate_normal(mean=updatedMu,cov=updatedSigma).rvs(1)
 
+def updateOmega(data,labels,a):
+    '''
+    updateOmega updates label weights (i.e. probabilities) using a Dirichlet distribution
+
+    Keyword argumetns:
+    data -- n-dimensional data as numpy.ndarray (n x p)
+    labels -- sample labels as numpy.ndarray (1 x n)
+    a -- prior label weights as numpy.ndarray (1 x j)
+
+    Returns numpy.ndarray (1 x j)
+    '''
+
+    # number of unique labels
+    n_labels = len(set(labels))
+
+    # coutn of samples with each label
+    V = [list(labels).count(ii) for ii in range(n_labels)];
+
+    return dirichlet([xx+yy for xx,yy in zip(a,V)]).rvs(1)[0]
