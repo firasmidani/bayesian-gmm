@@ -96,7 +96,7 @@ def computeSumSquares(data):
 
     return SumSquares
 
-def computePosteriorLabels(data,labels,Mu_s,Sigma_s,Omega_s):
+def computePosteriorLabels(data,Mu_s,Sigma_s,Omega_s):
     '''
     computePosteriorLabels calcualte posterior for each data point belonging to each label
 
@@ -110,21 +110,23 @@ def computePosteriorLabels(data,labels,Mu_s,Sigma_s,Omega_s):
     Returns numpy.ndarray (1 x j)
     '''
 
-    proba_list,proba_max_list = [],[];
+    V_list = [];
 
     for data_i in data:
 
         # compute posterior label probabilities 
-        proba = computeWeightedMVNormalPDF(data_i,labels,Mu_s,Sigma_s,Omega_s);
+        proba = computeWeightedMVNormalPDF(data_i,Mu_s,Sigma_s,Omega_s); 
 
         # record probabilities and the label with maximum probability
-        proba_list.append(proba);
-        proba_max_list.append(np.where(proba==np.max(proba))[0][0])
 
-    return proba_list,proba_max_list
+        V = list(np.random.multinomial(n=1,pvals=proba)); #print V
+        V = V.index(1);
+        V_list.append(V)
+
+    return V_list
 
 
-def computeWeightedMVNormalPDF(data_i,labels,Mu_s,Sigma_s,Omega_s):
+def computeWeightedMVNormalPDF(data_i,Mu_s,Sigma_s,Omega_s):
     '''
     t computes probability of a sample belonging to each cluster
 
@@ -141,14 +143,16 @@ def computeWeightedMVNormalPDF(data_i,labels,Mu_s,Sigma_s,Omega_s):
     mixture, proba = [],[]
 
     # compute label probability for each cluster
-    for jj,mj,sj,wj in zip(set(labels),Mu_s,Sigma_s,Omega_s):
+    for mj,sj,wj in zip(Mu_s,Sigma_s,Omega_s):
 
-        mixture.append(wj*computeMVNormalPDF(data_i,mj,sj))
+        mixture.append(wj*computeMVNormalPDF(data_i,mj,sj));
 
     # normalize label probability by marginal probability over all labels
     for mix in mixture:
 
-        proba.append(float(mix)/np.sum(mixture));
+        num = np.log10(mix+10**-10);
+        den = np.log10(np.sum(mixture)+(10**-10))
+        proba.append(num-den);
 
     return proba
 
@@ -287,9 +291,9 @@ def updateOmega(labels,a):
     '''
 
     # number of unique labels
-    n_labels = len(set(labels))
+    n_labels = set(labels)
 
     # coutn of samples with each label
-    V = [list(labels).count(ii) for ii in range(n_labels)];
+    V = [list(labels).count(ii) for ii in n_labels];
 
     return dirichlet([xx+yy for xx,yy in zip(a,V)]).rvs(1)[0]
